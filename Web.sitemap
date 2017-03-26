@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+	<siteMapNode url="Default.aspx" title="Home" description="">
+		<siteMapNode url="/Campaign/Default.aspx" title="Campaign"  description="">
+			<siteMapNode url="Campaign/List.aspx" title="캠페인 관리" description=""/>
+			<siteMapNode url="Campaign/company.aspx" title="회사" description=""/>
+			<siteMapNode url="Campaign/brand.aspx" title="브랜드" description=""/>
+			<siteMapNode url="Campaign/product.aspx" title="제품" description=""/>
+			<siteMapNode url="Campaign/camp.aspx" title="캠페인" description=""/>
+			<siteMapNode url="Campaign/event/Default.aspx" title="이벤트" description="">
+				<siteMapNode url="Campaign/event/oto/Default.aspx" title="원투원" description="">
+					<siteMapNode url="Campaign/event/oto/Wizard.aspx" title="원투원설정" description=""/>
+				</siteMapNode>
+			</siteMapNode>
+		</siteMapNode>
+		<siteMapNode url="/Product/Default.aspx" title="Product"  description="">
+			<siteMapNode url="Product/blank1.aspx?type=score" title="ScoreCard" description=""/>
+			<siteMapNode url="Product/setting/code/batchgoal.aspx?master=product" title="목표설정" description=""/>
+
+			
+		</siteMapNode>
+		<siteMapNode url="/Survey/Default.aspx" title="Survey"  description="">
+			<siteMapNode url="/Survey/View.aspx" title="Overview" description=""/>
+		</siteMapNode>
+		<siteMapNode url="/Report/Default.aspx" title="Reports"  description="">
+			<siteMapNode url="/Report/View.aspx" title="Report" description=""/>
+		</siteMapNode>
+		<siteMapNode url="/Setting/Default.aspx" title="Setting"  description="">
+			<siteMapNode url="setting/survey2/Default.aspx" title="설문관리" description="">
+				<siteMapNode url="setting/survey2/Wizard.aspx" title="설문설정마법사" description=""/>
+				<siteMapNode url="setting/survey2/Question/Default.aspx" title="질문관리" description=""/>
+				<siteMapNode url="setting/survey2/Answer/Default.aspx" title="답안관리" description=""/>
+				<siteMapNode url="setting/survey2/Template/Default.aspx" title="템플릿관리" description=""/>
+			</siteMapNode>
+			<siteMapNode url="setting/Widget/Default.aspx" title="위젯영역관리" description=""></siteMapNode>
+			<siteMapNode url="setting/Layout/Default.aspx" title="레이아웃관리" description="">
+				<siteMapNode url="setting/Layout/Wizard.aspx" title="레이아웃설정마법사" description=""/>
+			</siteMapNode>
+			<siteMapNode url="setting/Notice/Default.aspx" title="룰관리" description="">
+				<siteMapNode url="setting/Notice/View.aspx" title="룰 정보 조회" description=""/>
+				<siteMapNode url="setting/Notice/Wizard.aspx" title="룰 설정 마법사" description=""/>
+			</siteMapNode>
+			<siteMapNode url="setting/Content/Default.aspx" title="Content관리" description="">
+				<siteMapNode url="setting/Content/Edit.aspx" title="Content Editing" description=""/>
+			</siteMapNode>
+			<siteMapNode url="setting/code/Default.aspx" title="코드관리" description=""/>
+			<siteMapNode url="setting/code/View.aspx" title="서브코드관리" description=""/>
+			<siteMapNode url="setting/pr/Default.aspx" title="PR관리" description=""/>
+			<siteMapNode url="" title="리포트관리" description="">
+				<siteMapNode url="setting/Report/Default.aspx" title="리포트 구성" description="">
+					<siteMapNode url="setting/Report/RPWizard.aspx" title="리포트페이지설정" description=""/>
+				</siteMapNode>
+			</siteMapNode>
+			<siteMapNode url="" title="인증/서비스권한" description="">
+				<siteMapNode url="setting/Admin/UserAdmin.aspx" title="시스템 사용자 리스트" description="">
+					<siteMapNode url="setting/Admin/UserManage.aspx" title="사용자 설정" description=""/>
+				</siteMapNode>
+				<siteMapNode url="setting/Admin/GroupAdmin.aspx" title="시스템 그룹 리스트" description="">
+					<siteMapNode url="setting/Admin/GroupManage.aspx" title="그룹 설정" description=""/>
+				</siteMapNode>
+			</siteMapNode>
+			<siteMapNode url="setting/target/manage/Default.aspx" title="타겟조건관리" description=""/>
+			<siteMapNode url="setting/target/Default.aspx" title="타겟군 리스트" description="">
+				<siteMapNode url="setting/target/view.aspx" title="타겟군 설명" description=""/>
+				<siteMapNode url="setting/target/wizard.aspx" title="타겟군 설정" description=""/>
+			</siteMapNode>
+			<siteMapNode url="setting/Admin/Comp/Default.aspx" title="회사 리스트" description="">
+				<siteMapNode url="setting/Admin/Comp/CompEdit.aspx" title="회사 조직 설정" description=""/>
+			</siteMapNode>
+			<siteMapNode url="" title="Media" description="">
+				<siteMapNode url="setting/media/medialist.aspx" title="매체관리" description=""/>
+				<siteMapNode url="setting/media/mediaspacelist.aspx" title="프로그램/기사면" description=""/>
+			</siteMapNode>
+		</siteMapNode>
+		<siteMapNode url="/Work/Customer/List.aspx" title="고객 상담 리스트"  description="">
+			<siteMapNode url="/Work/Customer/Default.aspx" title="신규 고객 상담"  description=""/>
+		</siteMapNode>
+		<siteMapNode url="/Work/Default.aspx" title="작업"  description="">
+			<siteMapNode url="/Work/OutCall/Default.aspx" title="전화 상담"  description=""/>
+		</siteMapNode>
+		<siteMapNode url="/Controls/SG/Sungskin/SkinbankSVY/Default.aspx" title="스킨뱅크피부진단설문리스트"  description="">
+			<siteMapNode url="/Controls/SG/Sungskin/SkinbankSVY/Process.aspx" title="설문답변등록"  description=""/>
+		</siteMapNode>
+	</siteMapNode>
+</siteMap>

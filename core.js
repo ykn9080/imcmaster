@@ -4105,7 +4105,7 @@ function drawChart2(data, mode, cht, opt) {
     //mode: div id to insert chart(''= chartid)
     var rtn = googlechartdt(cht, data);
     var options = {}, ctype = "ColumnChart", layout, flist = "", slist = "", val = "", ser = "", ax = "", json;
-    json = rtn.json, options = rtn.options, ctype = rtn.ctype, flist = rtn.flist, slist = rtn.slist;
+    json = rtn.json, options = rtn.options, ctype = rtn.ctype, flist = rtn.flist, slist = rtn.slist,options.height=1100;
     switch (mode) {
         case "edit":
             wrapper = new google.visualization.ChartWrapper({
@@ -4114,7 +4114,8 @@ function drawChart2(data, mode, cht, opt) {
                 containerId: 'dvChart',
                 'options': options
             });
-            styleInsert("charteditor-style", ".google-visualization-charteditor-dialog {   width:960px;height:560px;border:solid 1px gray;z-index: 402 !important;}");
+            styleInsert("charteditor-style", ".google-visualization-charteditor-dialog {   max-width:1000px;width:1100px;height:560px;border:solid 1px gray;z-index: 402 !important;}");
+          
             chartEditor = new google.visualization.ChartEditor();
             chartEditor.openDialog(wrapper, {});
             google.visualization.events.addListener(chartEditor, 'ok', function () {
@@ -4134,17 +4135,21 @@ function drawChart2(data, mode, cht, opt) {
                 if ($('#dvChtedit').length)
                     $('#dvChtedit').empty();
                 drawChart1('dvChtedit', opt);
+              
             });
             break;
         case "dvChtedit":
             //options.height = "100%";
             $('#dvChtedit').empty();
             console.log(cht, json, data)
-            drawDashboard('dvChtedit', cht, json, data);
+           // drawDashboard('dvChtedit', cht, json, data);
+            simplechart('dvChtedit', cht, json, data);
             break;
         default:
             //options.height = 350;
-            drawDashboard(mode, cht, json, data);
+            //drawDashboard(mode, cht, json, data);
+            console.log(mode, cht, json, data)
+            simplechart(mode, cht, json, data);
             break;
     }
 }
@@ -4291,6 +4296,28 @@ function makeGoogleDataTable(data, axislist, series, valuelist, filterlist, sort
     return result;
 
 }
+function simplechart(dvcht, cht, json, data) {
+    var preview = false,ht=200;
+    if (dvcht == "dvChtedit") preview = true;
+    if (dvcht == "") dvcht = chartdiv;
+    if (typeof dvcht == "object") var gchart = dvcht;
+    else
+        var gchart = $("#" + dvcht);
+    if(dvcht!="dvChtedit")ht= cht.setting[2][1];
+    var chart = new google.visualization[cht.chartType](document.getElementById(dvcht));
+    var options = {
+        'width': $("#" + dvcht).width()-40,
+        'height':ht
+    };
+    if (cht.options.hasOwnProperty("title")) options.title = cht.options.title;
+    chart.draw(json, options);
+    console.log(options,cht.setting[2][1])
+    if (!preview && (cht.hasOwnProperty("setting"))) {
+        var set = cht.setting, title = set[1][1];
+        if (cht.setting[0][1] != "none")
+            wrapcontrol(dvcht, title, dvcht, "", reloadcht, [chartdiv, { gdt: cht }]);
+    }
+}
 function axismake(layout) {
     var rtn = {}, sort = [], sum, val = [], dir = false;
     $.each(layout, function (i, k) {
@@ -4321,16 +4348,16 @@ function axismake(layout) {
 var paramshow = "none";
 var tb = "", drawcht;
 function drawDashboard(dvcht, cht, json, data) {
-    drawDashboard.reloadcht = reloadcht;
-    var preview = false;
+     var preview = false;
     if (dvcht == "dvChtedit") preview = true;
     if (dvcht == "") dvcht = chartdiv;
     if (typeof dvcht == "object") var gchart = dvcht;
     else
         var gchart = $("#" + dvcht);
     var cs = { overflow: "hidden" };
-    if (htdefine != "")
-        cs.height = htdefine;
+    
+   // if (htdefine != "")
+        cs.height = cht.setting[2][1]
     gchart.css(cs);
    
     var contain = document.createElement('div');
@@ -4382,7 +4409,6 @@ function drawDashboard(dvcht, cht, json, data) {
         dvdash.appendChild(dvcht);
         //dvdash.appendChild(dvactr);
         dvactr.setAttribute("style", "padding:0px 0 5px 5px;display:" + paramshow + ";height:50px;");
-
     }
     else {
         //dvdash.appendChild(dvactr);
@@ -4438,9 +4464,9 @@ function drawDashboard(dvcht, cht, json, data) {
     //cdv.addClass(cls);
     if (!preview && (cht.hasOwnProperty("setting"))) {
         var set = cht.setting, title = set[1][1];
-        console.log(cdv.parent().attr("class"))
-        if(cdv.parent().attr("class")!="panel-body")
-        wrapcontrol(cdv, title, cdv, "", reloadcht, [chartdiv]);
+        console.log(cht.setting[0][1])
+        if(!(cdv.parent().attr("class")=="panel-body" &&  cht.setting[0][1]=="none"))
+            wrapcontrol(cdv, title, cdv, "", reloadcht, [chartdiv, {gdt:cht}]);
 
         //if (cdv.find("ul").length == 0) {
         //    cdv.prepend($("<ul><li><a href='#dvContainer'>" + set[1][1] + "</a></li></ul>"));
@@ -4450,16 +4476,19 @@ function drawDashboard(dvcht, cht, json, data) {
         //checksubsetting(chartdiv, set[0][1]);
     }
 
-    function reloadcht(chartdiv) {
-        //if (fullwin) {
-            var cht = $("#" + chartdiv);
-            var styl = cht.attr("style");
-            var pp = cht.parent();
-            cht.remove();
-            pp.append($("<div id='" + chartdiv + "' class='googlechart' style='"+styl+"'/>"));
-            googlechartInit(chartdiv);
-        //}
-    }
+  
+}
+function reloadcht(chartdiv, option) {
+    console.log(chartdiv,option)
+    //if (fullwin) {
+    var cht = $("#" + chartdiv);
+    var styl = cht.attr("style");
+    var pp = cht.parent();
+    cht.empty();
+   // styl = "width:1400px;height:1000px";// + $(window).height();
+   // pp.append($("<div id='" + chartdiv + "' class='googlechart' />"));
+    googlechartInit(chartdiv,option);
+    //}
 }
 function selectHandler1(chartid, data, cht) {
     //var selection = drawcht.getChart().getSelection();
@@ -6032,9 +6061,10 @@ function fullCalendarInit(dvid, options) {
         }, 0);
     }
 }
-function fullCalendarresize(cal) {
-    console.log(cal)
-    cal.fullCalendar('option', 'height', $(window).height()-30);
+function fullCalendarresize(cal,height) {
+    var ht = $(window).height();
+    if (typeof height!="undefined") ht = height;
+    cal.fullCalendar('option', 'height', ht);
 }
 function selRepeatChange() {
     var dd = "";
@@ -6809,7 +6839,7 @@ function selChanChange() {
 //#endregion
 
 //#region map
-var mapcntr;
+var mapcntr,initialsize=[];
 function mapInit(id, option) {
     //if (typeof option != "undefined" && option.hasOwnProperty("gdt")) {
     //    console.log(id, JSON.stringify(option.gdt)); return false;
@@ -7038,26 +7068,32 @@ function mapInit(id, option) {
             var type = gdt.setting.tab, dvid = dv.attr("id"), tabname = gdt.setting.tabname, opt = {};
           
             opt.optdialog = {}; opt.optdialog.width = $("#" + id).closest("td").width();
-           
+            var opt = {};
+            opt.w = dv.width(), opt.h = dv.height(), opt.id = dvid, chkexist = false;
+            console.log(initialsize)
+            $(initialsize).each(function (i, k) {
+                if (k.id == dvid) {
+                    chkexist = true;
+                }
+            });
+            console.log(chkexist,dvid)
+            if (!chkexist)
+                initialsize.push(opt);
+
             switch (gdt.setting.display) {
                 case "dropdown":
                     inputdropdown(id, opt);
                     var parent = $("<div id='parent" + dvid + "' />");
                     dv.wrap(parent);
-                    var opt = {};
-                    opt.w = dv.width(), opt.h = dv.height();
-                    wrapcontrol("parent" + id, "maptest", id, "", resizemap, [maptype, map, opt]);
-                    //wrapcontrol(id, "maptest", id, "", resizemap, [maptype,map]);
+                    wrapcontrol("parent" + id, "maptest", id, "", resizemap, [maptype, map,dvid, opt]);
                     break;
                 case "dialog":
-                    inputdialog(id, opt, resizemap, [maptype,map]);
+                    inputdialog(id, opt, resizemap, [maptype,map,dvid,opt]);
                     break;
                 case "wrap":
                     var parent = $("<div id='parent" + dvid + "' />");
                     dv.wrap(parent);
-                    var opt = {};
-                    opt.w = dv.width(),opt.h=dv.height();
-                    wrapcontrol("parent" + id, "maptest", id, "", resizemap, [maptype, map,opt]);
+                    wrapcontrol("parent" + id, "maptest", id, "", resizemap, [maptype, map,dvid,opt]);
                     break;
             }
         }
@@ -7072,13 +7108,16 @@ function mapInit(id, option) {
             case "daum": case "naver": case "streetdirectory": case "google":
                 if ($("#address").length == 0) {
                     inp.css({ position: "absolute", top: "10px", right: "1%", "z-index": 10003 });
-                    inp.attr("onfocus", "this.value='';$('.pac-container').css({ 'z-index': 10003, display: 'block' });");
-
+                    inp.attr("onfocus", " $('.pac-container').remove();this.value='';$('.pac-container').css({ 'z-index': 10003 });");
+                 
                     $("#" + id).append(inp);
                     $("#" + id).css("position", "relative");
                 }
                 else {
                     var inp = $("#address");
+                    inp.click(function () {
+                        $('.pac-container').hide();
+                    })
                 }
                 $("#address").keyup(function (event) {
                     var keycode = (event.keyCode ? event.keyCode : event.which);
@@ -7090,8 +7129,7 @@ function mapInit(id, option) {
                             k.close();
                         });
                         $(".pac-container").hide();
-                        //$("parent"+id).siblings(".hidescroll")
-                        $("#containopen").click();
+                       
                         event.preventDefault();
                         funLoading();
                         switch (maptype) {
@@ -7106,6 +7144,7 @@ function mapInit(id, option) {
                                 break;
                         }
                       
+                       
                        return false;
                     }
                 });
@@ -7150,6 +7189,8 @@ function mapInit(id, option) {
                         window.alert('Geocoder failed due to: ' + status);
                     }
                 });
+                $("#containopen").click();
+               
                 funStop();
             });
         };
@@ -7178,6 +7219,8 @@ function mapInit(id, option) {
               
                // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
                map.setBounds(bounds);
+               $("#containopen").click();
+              
                funStop();
            }
        }
@@ -7203,6 +7246,8 @@ function mapInit(id, option) {
                
                // map.fitBounds(bounds);
                 map.setZoom(13)
+                $("#containopen").click();
+               
                 funStop();
             }
        }
@@ -7224,36 +7269,38 @@ function mapInit(id, option) {
            var map = $("#parent" + id);
            var panel = map.parent(), wth = panel.width() - 270, ht = panel.height();
            map.css({ float: "right", width: wth });
-           var container=$(".hidescroll");
+           var container = $(".hidescroll");
            if (container.length > 0) container.empty();
            else {
                container = $("<div class='hidescroll' style='float:left;'><div/>");
                container.css({ height: ht, overflow: 'auto' });
            }
-           panel.prepend(container);
+
+           if (panel.find(".panel-primary").length > 0)
+               container.insertAfter(panel.find(".panel-primary"));
+           else
+               panel.prepend(container);
            var close = $('<div style="padding:10px;"><button id="containclose" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button><div>').appendTo(container);
            var open = $("#containopen");
            if (open.length == 0) {
                open = $("<div id='containopen' style=' position: absolute;top: 250px;left: 0px;z-index:10;display:none;'><i class='fa fa-toggle-right fa-2x imdim'/></div>");//$('<button type="button" class="close rotate" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
                panel.append(open);
            }
-               var grp=$("<div class='list-group' style='width:250px'/>").appendTo(container);
-           //$(list).each(function(i,k){
-              
-           //});
-         
-          
-        
-          close.click(function(){
-              map.css({ width: "100%" });
-              panel.css({ position: "relative" });
-              container.hide();
-              open.show();
+           var grp = $("<div class='list-group' style='width:250px'/>").appendTo(container);
+
+           close.click(function () {
+               map.css({ width: "100%" });
+               $("#" + id).css({ width: "100%" });
+               panel.css({ position: "relative" });
+               container.hide();
+               open.show();
            });
-           open.click(function(){
-               map.css({ width: wth});
-               panel.css({ position: "" });
+           open.click(function () {
+               wth = map.parent().width() - 270;
+               map.css({ width: wth });
+               $("#" + id).css({ width: wth });
                container.show();
+               container.css("height", map.height());
                open.hide();
            });
            return grp;
@@ -7619,6 +7666,7 @@ function mapInit(id, option) {
             return rtn
     }
 }
+
 function stopRKey(evt) {
     var evt = (evt) ? evt : ((event) ? event : null);
     var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
@@ -7823,31 +7871,30 @@ function mapdeclare(objname, maptype, optobj) {
     return rtn;
 }
 
-function resizemap(maptype,map,opt) {
+function resizemap(maptype, map, id, opt) {
+    var w = opt.w, h = opt.h;
     switch (maptype) {
         case "google":
-            var center = map.getCenter();
+            $("#" + id).css({ width: w, height: h });
             google.maps.event.trigger(map, "resize");
-            map.setCenter(center);
             break;
         case "naver":
-            var center = map.getCenter();
-            var w = opt.w, h = opt.h;
             map.setSize(new naver.maps.Size(w, h));
-            map.setCenter(center);
             break;
         case "daum":
-            var center = map.getCenter();
+            $("#" + id).css({ width: w, height: h });
             map.relayout();
-            map.setCenter(center);
             break;
         case "streetdirectory":
-            var cnt = map.getCenter();
-        map.resizeViewport(opt.w, opt.h);
-        map.setCenter(cnt);
-            console.log(map,cnt)
-           
+            map.resizeViewport(opt.w, opt.h);
             break;
+    }
+    var center = map.getCenter();
+    map.setCenter(center);
+
+    if (opt.hasOwnProperty("widthsidebyside")) {
+        console.log($(window).width() - opt.widthsidebyside,$("parent" + opt.id).width())
+        $("#parent" + opt.id).css({ float: "left", width: $(window).width() - opt.widthsidebyside-50 });
     }
 }
 var getpos;
@@ -9147,7 +9194,7 @@ function multilangInject() {
 
 
 //region expand collapse control
-function wrapcontrol(object, title, inobj, type,callback,paramarr) {
+function wrapcontrol(object, title, inobj, type,callback,paramarr1) {
     //object:control div or its id, title: tab or head title txt, inobj:inner div id or object, callback:function aft expand or collapse
     var id = object, inid = inobj;
     if (typeof object == "object") id = object.attr("id");
@@ -9158,13 +9205,13 @@ function wrapcontrol(object, title, inobj, type,callback,paramarr) {
             inobj.attr("id", inid);
         }
     }
-    console.log(id)
+  
     if ($("#" + id).closest("table").attr("id") == "tblEditor")
         return false;
    // $("#" + id).prepend($("<ul><li><a href='#" + inid + "'>" + title + "</a></li></ul>"));
     setTimeout(function () {
         var content = $("#" + id);
-        var panel = $("<div class='panel panel-info'/>").insertBefore(content);
+        var panel = $("<div class='panel panel-info' style='clear:both'/>").insertBefore(content);
         var head = $('<div class="panel-heading" />');
         var htitle = $('<h3 class="panel-title pull-left">' + title + '</h3>').appendTo(head);
         var hbtn = $("<i id='irebtn" + id+"' class='fa fa-plus-square-o pull-right imdim'/>").appendTo(head);
@@ -9175,22 +9222,20 @@ function wrapcontrol(object, title, inobj, type,callback,paramarr) {
         $(["jqgrid", "map", "fullcalendar"]).each(function (a, b) {
             if (content.hasClass(b) | content.children().hasClass(b)) {
                 body.css("padding", 0);
-                if (b != "map")
-                panel.css("border", "none");
+                //if (b != "map")
+                //panel.css("border", "none");
             }
         });
    
         content.wrap(body);
         panel.append(content.parent());
-       
+      
         $("#irebtn" + id).click(function (e) {
-            if (typeof callback == "function")
-                callbackexewithparam(callback, paramarr);
-            expandcollapsediv($("#" + id), callback, paramarr);
-           // xy($(this), e);
+            expandcollapsediv($("#" + id), callback, paramarr1);
             if (typeof callback == "function" && inid.indexOf("gbox_jq")>-1)
-                callbackexewithparam(callback, paramarr);
-            $('#' + id).fullCalendar('option', 'height', $(window).height() - 30);
+                callbackexewithparam(callback, paramarr1);
+            //if($('#'+id).hasClass('fullcalendar'))
+          //      $('#' + id).fullCalendar('option', 'height', $(window).height());
         });
     }, 0);
     function xy(that, e) {
@@ -9200,126 +9245,122 @@ function wrapcontrol(object, title, inobj, type,callback,paramarr) {
         cursor = [relativeX, relativeY];
     }
 }
-function checksubsetting(id, type) {
-    if (tabdefine != "") type = tabdefine;//define tab type in subid level
-    if ($.inArray(type, ["none", "tab"], type) == -1) {
-        var aa = $("#" + id).find("ul>li>a");
-        $("#" + id).find("ul>li").remove();
-        var outdv = $("<div style='float:left'/>");
-        outdv.append(aa);
-        $("#" + id).find("ul").prepend(outdv);
-    }
-    switch (type) {
-        case "round":
-            break;
-        case "rect":
-            $("#" + id + ">ul").removeClass("ui-corner-all");
-            $("#" + id ).removeClass("ui-corner-all");
-            break;
-    }
-}
-function expbtninsert(id, callback,paramarr) {
-    //in case tab alrealy exists, insert expand icon only 
-    var expbtn = $("<div style='float:right;padding:6px 4px 0 0;'></div>");
-    expbtn.attr("title", "expand full size");
-    expbtn.append(
-    $('<i/>', {
-        id: 'iclose' + id,
-        class: 'fa fa-minus-square-o fa-lg imdim',
-        style: 'color:gray;margin-right:1px'
-    })
-    ).append(
-    $('<i/>', {
-        id: 'irebtn' + id,
-        class: 'fa fa-plus-square-o fa-lg imdim',
-        style: 'color:gray;'
-    })
-    );
-    if ($("#irebtn" + id).length == 0) {
-        $("#" + id + " ul").first().append(expbtn);
-        $("#irebtn" + id).click(function (e) {
-            expandcollapsediv($("#" + id),callback,paramarr);
-            xy($(this), e);
-            if (typeof callback == "function")
-                callbackexewithparam(callback, paramarr);
-        });
-        $("#iclose" + id).click(function (e) {
-            var cont = $("#"+id).find('ul').next();
-            cont.toggle();
-        });
-    }
-    function xy(that,e) {
-        var offset = that.offset();
-        var relativeX = (e.pageX - offset.left);
-        var relativeY = (e.pageY - offset.top);
-        cursor = [relativeX, relativeY];
-    }
-}
-//function expandcollapsemake(element, container) {
-//    var bar = $("<div style='text-align:right;height:28px;padding:8px 8px 0 0;margin-bottom:5px;' />");//margin-bottom:5px;border-bottom:1px #BABABA solid; class='ui-widget-header'
-//    var rebtn = $("<i id='irebtn' class='imdim fa fa-search-plus fa-lg' />");
-//    bar.append(rebtn);
-//    rebtn.click(function () {
-//        expandcollapsediv(element, container);
-//    });
-//    return bar;
-//}
-var fullwin = false, cursor = [0,0],originopt,elementparent;
-function expandcollapsediv(element,callback,paramarr) {
-    var wth = element.parent().width();
-   // var id = element.attr("id");
+var fullwin = false, cursor = [0,0],originopt,elementparent,originw,originh;
+function expandcollapsediv(element, callback, paramarr) {
     if (fullwin) {
+        element.removeAttr("style");
+        element.attr("style", styval);
+        var elementchildren = element.parent().children().not(".panel-primary");
+        elementparent.append(elementchildren);//because inputdropdown moved to child of td, others are not affected
+        $("#elecontain").remove();
+        elementparent.css("position", "relative");
+        if (element.find(".map").length > 0) {
+            setTimeout(function () {
+                element.css("float", "right");
+                var open = false;
+                if ($(".hidescroll").css("display") == "block")
+                    open = true;
+                $("#containclose").click();
+               if(open)
+                    $("#containopen").click();
+                $(".hidescroll").css("height", element.height());
+            }, 100);
+        }
+
         setTimeout(function () {
             if (typeof callback == "function") {
-                if (typeof paramarr!="undefined" && typeof originopt != "undefined" && paramarr.length == 3)
-                    paramarr.splice(2, 1, originopt);
+                if (typeof paramarr != "undefined" && typeof originopt != "undefined" && paramarr.length >= 3) {
+                    paramarr[3].w = originw, paramarr[3].h = originh;
+                }
+                if (element.hasClass("fullcalendar") | element.find(".fullcalendar").length > 0) {
+                    paramarr.splice(1, 1, originh);
+                }
+                if (element.hasClass("googlechart") | element.find(".googlechart").length > 0) {
+                    paramarr[1].gdt.setting[2][1] = originh;
+                }
+
+                console.log(paramarr);
                 callbackexewithparam(callback, paramarr);
             }
         }, 0);
-        element.removeAttr("style");
-        element.attr("style", styval);
-        element.find("div:eq(0)").remove();
-        var elementchildren = $("#elecontain").children().not(".panel-primary");
-        elementparent.append(elementchildren);//because inputdropdown moved to child of td, others are not affected
-        $("#elecontain").remove();
-     
         window.scrollTo(cursor[0], cursor[1]);
         fullwin = false;
     }
     else {
         //container move top:0,left:0,position:absolute
+        originw = element.parent().width();
+        originh = element.parent().height();
+        // var id = element.attr("id");
         styval = element.attr("style");
         element.removeAttr("style");
         var td = element.closest("td")// move element child of td
         elementparent = element.parent();//when returning place to append
-        var elementcontain = $("<div id='elecontain'/>");
-        elementcontain.append(elementparent.children());
-        elementcontain.prependTo(td);
-
-        elementcontain.css({
-            position: "absolute", left: 0, top: 0, bottom: 0, right: 0, width: "99.1%", height: $(window).height()
-            , "background-color": "white", padding: "0 5px 0 5px", "z-index": 10001
+        var elementwrap = $("<div  id='elecontain'></div>");
+       
+        elementwrap.append(elementparent.children());
+        elementwrap.prependTo(td);
+        var eh = element.height(), wh = $(document).height();
+        if (eh > wh) wh = eh;
+        elementwrap.css({
+            position: "absolute", left: 0, top: 0, bottom: 0, right: 0, width: "99.3%", height:wh
+            , "background-color": "white", padding: "0 0 0 5px", "z-index": 10001
         });
         var sty = { position: "absolute", left: 0, top: 0 };
         var head = $('<div class="panel-heading" style="height:35px"/>');
         var htitle = $('<h3 class="panel-title pull-left">' + 'hh' + '</h3>').appendTo(head);
         var hbtn = $("<i class='fa fa-times-circle pull-right imdim'/>").appendTo(head);
         var panel = $("<div class='panel panel-primary'/>").append(head);
-        elementcontain.prepend(panel);
+        elementwrap.prepend(panel);
         window.scrollTo(0, 0);
         fullwin = true;
-        if (typeof callback == "function") {
-            if (typeof paramarr!="undefined" && paramarr.length == 3) {
-                originopt = paramarr[2];
-              //  paramarr.splice(2, 1, { w: $(window).width() - 15, h: $(window).height() - 70 });
-                paramarr.splice(2, 1, { w: $(window).width() - 15, h: $(window).height() });
-            }
-            callbackexewithparam(callback, paramarr);
-        }
-
         hbtn.on("click", function () {
+            console.log(paramarr);
             expandcollapsediv(element, callback, paramarr)
         });
+        if (typeof callback == "function") {
+            if (element.find(".map").length > 0) {
+                originopt = paramarr[3], clone = originopt;
+                clone.w = $(window).width() - 15;
+                clone.h = $(window).height();
+                if (widthsidebyside(element) > 15)
+                    clone.widthsidebyside = widthsidebyside(element);
+                paramarr.splice(3, 1, clone);
+                callbackexewithparam(callback, paramarr);
+                setTimeout(function () {
+                    var open = false;
+                    if ($(".hidescroll").css("display") == "block")
+                        open = true;
+                    $("#containclose").click();
+                    if (open)
+                        $("#containopen").click();
+                    $(".hidescroll").css("height", clone.h);
+                }, 100);
+            }
+            else if (element.hasClass("googlechart")| element.find(".googlechart").length > 0) {
+                var originh = paramarr[1].gdt.setting[2][1];
+                paramarr[1].gdt.setting[2][1] = $(window).height();
+                paramarr[1].gdt.setting[0][1] = "none";
+                callbackexewithparam(callback, paramarr);
+                console.log(paramarr)
+            }
+            else
+                callbackexewithparam(callback, paramarr);
+        }
+
+        $(["map", "fullcalendar", "googlechart"]).each(function (i, k) {
+            if (element.hasClass(k) | element.find("."+k).length > 0)
+                panel.css("margin-bottom", 0);
+        });
+        if (element.find(".map").length == 0)
+            elementwrap.css("z-index", 10004);
+    }
+    function widthsidebyside(element) {
+        var rtn = 15;
+        $(element.siblings().not($(".panel-primary"))).each(function (i, k) {
+            if (rtn < $(k).width())
+                rtn = $(k).width();
+        });
+        return rtn;
     }
 }
 function inputdropdown(objid, options) {
